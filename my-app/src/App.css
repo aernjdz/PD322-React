@@ -75,7 +75,7 @@ a, a:hover, a:focus {
   padding: 5px;
   border-radius: 50%;
   color: #475F7B;
-  transition: 0.35s;
+  transition: 0.75s;
   font-size: 14px;
 }
 .rc-accordion-body{
