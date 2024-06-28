@@ -1,7 +1,7 @@
 
 import './App.css';
-import MainHeader from "./Components/containers/header";
-import Accordion from "./Components/containers/acordion";
+// import MainHeader from "./Components/containers/header";
+// import Accordion from "./Components/containers/acordion";
 import {Route, Routes} from "react-router-dom";
 import Layout from "./Components/containers";
 import HomePage from "./Components/home";
