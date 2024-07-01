@@ -1,5 +1,5 @@
 import React, { useState ,useEffect} from 'react';
-import { TextInput, TextArea } from "../../common/input/text";
+import { TextInput, TextArea ,DateInput } from "../../common/input/text";
 import FileInput from "../../common/input/files";
 import { Modal, Button } from 'react-bootstrap';
 import * as Yup from 'yup';
@@ -41,7 +41,7 @@ const RegisterPage = () => {
         image: Yup.mixed().required('Profile picture is required').test(
             'fileType',
             'Please select a valid image file',
-            (value) => value && value.type.startsWith('image/')
+            (value) => value && value?.type.startsWith('image/')
         )
     });
 
@@ -183,7 +183,16 @@ const RegisterPage = () => {
                             invalidFeedback={ validated && validationErrors.password}
                         />
                     </div>
+                    <div className={'mb-3'}>
+                        <DateInput
+                            onChange={handleChange}
+                            name={'date'}
+                            id={'date'}
+                            label={"Birth Day"}
+                            required={true}
 
+                            />
+                    </div>
                     <div className="mb-3">
                         <TextArea
                             id="textarea"

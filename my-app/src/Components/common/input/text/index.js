@@ -67,4 +67,34 @@ TextArea.propTypes = {
     rows: PropTypes.number,
 };
 
-export  {TextArea , TextInput};
+
+const DateInput = ({ id, label, name, value, onChange, required = false, invalidFeedback, placeholder }) => {
+    return (
+        <>
+            <label htmlFor={id} className="form-label">{label}</label>
+            <input
+                type="date"
+                className="form-control"
+                id={id}
+                name={name}
+                value={value}
+                placeholder={placeholder}
+                onChange={onChange}
+                required={required}
+            />
+            {invalidFeedback && <div className="invalid-feedback">{invalidFeedback}</div>}
+        </>
+    );
+}
+DateInput.propTypes = {
+    id: PropTypes.string.isRequired,
+    label: PropTypes.string.isRequired,
+    name: PropTypes.string.isRequired,
+    value: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+    onChange: PropTypes.func.isRequired,
+    required: PropTypes.bool,
+    invalidFeedback: PropTypes.string,
+    placeholder: PropTypes.string,
+};
+
+export  {TextArea , TextInput , DateInput};
