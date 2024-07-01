@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from 'react';
-import {TextInput,TextArea} from "../../common/input/text";
+import React, { useState ,useEffect} from 'react';
+import { TextInput, TextArea } from "../../common/input/text";
 import FileInput from "../../common/input/files";
-
-import IMask from 'imask';
 import { Modal, Button } from 'react-bootstrap';
+import * as Yup from 'yup';
+import IMask from "imask";
 const RegisterPage = () => {
     const [formData, setFormData] = useState({
         email: '',
@@ -16,52 +16,10 @@ const RegisterPage = () => {
     const [validated, setValidated] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [modalMessage, setModalMessage] = useState('');
+    const [validationErrors, setValidationErrors] = useState({});
 
-
-
-    const handleChange = (e) => {
-        const { name, value, files } = e.target;
-
-        if (name === 'photo' && files[0]) {
-            const file = files[0];
-            if (file.type.startsWith('image/')) {
-                setFormData({
-                    ...formData,
-                    image: file
-                });
-            } else {
-
-                setModalMessage("Please select a valid image file");
-                setShowModal(true);
-            }
-        } else {
-            setFormData({
-                ...formData,
-                [name]: value
-            });
-        }
-    };
-
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        const form = e.currentTarget;
-        if (!form.checkValidity() || !formData.image) {
-            e.stopPropagation();
-            setValidated(true);
-            if (!formData.image) {
-                setModalMessage("Please select a profile picture");
-                setShowModal(true);
-            } else {
-                setModalMessage("Please input valid data");
-                setShowModal(true);
-            }
-            return;
-        }else{
-            setValidated(true);
-            console.log(`Form Add: ${JSON.stringify(formData, null, 2)}`);
-        }
-
-    };
+    const phoneRegExp = /^\+\d{2}\(\d{3}\) \d{3}-\d{2}-\d{2}$/;
+    // Define Yup schema for validation
 
     useEffect(() => {
         const phoneInput = document.getElementById('phone');
@@ -73,98 +31,171 @@ const RegisterPage = () => {
         }
 
     }, []);
+    const schema = Yup.object().shape({
+        email: Yup.string().email('Invalid email').required('Email is required'),
+        lastName: Yup.string().required('Last name is required'),
+        firstName: Yup.string().required('First name is required'),
+        password: Yup.string().required('Password is required').min(6, 'Password must be at least 6 characters long'),
+        phone: Yup.string().matches(phoneRegExp, 'Phone number is not valid'),
+        textarea: Yup.string().required('Text is required'),
+        image: Yup.mixed().required('Profile picture is required').test(
+            'fileType',
+            'Please select a valid image file',
+            (value) => value && value.type.startsWith('image/')
+        )
+    });
+
+    const handleChange = (e) => {
+        const { name, value, files } = e.target;
+        if (name === 'photo' && files[0]) {
+            const file = files[0];
+            if (file.type.startsWith('image/')) {
+                setFormData({
+                    ...formData,
+                    image: file
+                });
+            } else {
+                setModalMessage("Please select a valid image file");
+                setShowModal(true);
+            }
+        } else {
+            setFormData({
+                ...formData,
+                [name]: value
+            });
+        }
+    };
+
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            await schema.validate(formData, { abortEarly: false });
+            setValidated(true);
+            console.log(`Form Add: ${JSON.stringify(formData, null, 2)}`);
+        } catch (error) {
+            console.log(error);
+            setValidated(true);
+            const errors = {};
+            error.inner.forEach(err => {
+                errors[err.path] = err.message;
+            });
+            setValidationErrors(errors);
+            setModalMessage("Input Data is invalid! Please check input data.");
+            setShowModal(true);
+        }
+    };
+
     return (
         <>
             <h1 className="text-center">Register</h1>
             <div className="row mt-5">
                 <form id="signupForm"
-                      className={`col-md-6 offset-md-3 needs-validation ${validated ? 'was-validated' : ''}`}
+                      className={`col-md-6 offset-md-3 ${validated ? 'was-validated' : ''}`}
                       onSubmit={handleSubmit} noValidate>
 
-                    <div className={"row"}>
-                        <div className={"mb-3 col-md-6"}>
+                    <div className="row">
+                        <div className="mb-3 col-md-6">
                             <TextInput
                                 id="lastName"
-                                type={'text'}
+                                type="text"
                                 label="Last Name"
                                 name="lastName"
                                 value={formData.lastName}
                                 onChange={handleChange}
                                 required={true}
-                                invalidFeedback="Please provide your last name."
-                                placeholder={'Last Name'}
+                                className={`form-control ${validated && validationErrors.lastName ? 'is-invalid' : 'is-valid' }`}
+                                placeholder="Last Name"
+                                invalidFeedback={ validated && validationErrors.lastName}
                             />
 
                         </div>
-                        <div className={"mb-3 col-md-6"}>
+                        <div className="mb-3 col-md-6">
                             <TextInput
                                 id="firstName"
                                 label="First Name"
-                                type={'text'}
+                                type="text"
                                 name="firstName"
                                 value={formData.firstName}
                                 onChange={handleChange}
                                 required={true}
-                                invalidFeedback="Please provide your name."
-                                placeholder={'First Name'}/>
-
+                                className={`form-control ${validated && validationErrors.firstName ? 'is-invalid' : 'is-valid' }`}
+                                placeholder="First Name"
+                                invalidFeedback={validated && validationErrors.firstName}
+                            />
                         </div>
                     </div>
-                    <div className={"row"}>
-                        <div className={"mb-3 col-md-6"}>
+
+                    <div className="row">
+                        <div className="mb-3 col-md-6">
                             <TextInput
                                 id="email"
                                 label="Email"
-                                type={'email'}
+                                type="email"
                                 name="email"
                                 value={formData.email}
                                 onChange={handleChange}
                                 required={true}
-                                invalidFeedback="Please provide a valid email."
-                                placeholder={'example@gmail.com'}/>
-
+                                className={`form-control ${validated && validationErrors.email ? 'is-invalid' : 'is-valid' }`}
+                                placeholder="example@gmail.com"
+                                invalidFeedback={ validated && validationErrors.email}
+                            />
                         </div>
-                        <div className={"mb-3 col-md-6"}>
+                        <div className="mb-3 col-md-6">
                             <TextInput
                                 id="phone"
                                 label="Phone"
-                                type={'tel'}
+                                type="tel"
                                 name="phone"
                                 value={formData.phone}
                                 onChange={handleChange}
                                 required={true}
-                                invalidFeedback="Please provide a phone number."
-                                placeholder={"+XX(XXX) XXX-XX-XX"}/>
+                                className={`form-control ${validated && validationErrors.phone ? 'is-invalid' : 'is-valid' }`}
+                                placeholder="+XX(XXX) XXX-XX-XX"
+                                invalidFeedback={ validated && validationErrors.phone}/>
                         </div>
                     </div>
+
                     <div className="row d-flex align-items-center">
-
-
-                            <FileInput id={'photo'}
-                                       label={'Photo'}
-                                       name="photo"
-                                       accept={"image/*"}
-                                       onChange={handleChange}
-                                       value={formData.image}
-                                       required={true}
-                                       invalidFeedback="Please provide a profile picture."/>
-
+                        <FileInput
+                            id="photo"
+                            label="Photo"
+                            name="photo"
+                            accept="image/*"
+                            onChange={handleChange}
+                            value={formData.image}
+                            required={true}
+                            invalidFeedback={ validated && validationErrors.image}
+                            className={`form-control ${validated && validationErrors.image ? 'is-invalid' : 'is-valid' }`}/>
 
                     </div>
-                    <div className={"mb-3"}>
+
+                    <div className="mb-3">
                         <TextInput
                             id="password"
                             label="Password"
-                            type={'password'}
+                            type="password"
                             name="password"
                             value={formData.password}
                             onChange={handleChange}
                             required={true}
-                            invalidFeedback="Please provide a password."/>
+                            className={`form-control ${validated && validationErrors.password ? 'is-invalid' : 'is-valid' }`}
+                            invalidFeedback={ validated && validationErrors.password}
+                        />
                     </div>
-                    <div className={"mb-3"}>
-                        <TextArea onChange={handleChange} name={"textarea"} id={"textarea"} label={"Hobies"} required={true}/>
+
+                    <div className="mb-3">
+                        <TextArea
+                            id="textarea"
+                            label="Hobbies"
+                            name="textarea"
+                            onChange={handleChange}
+                            required={true}
+                            className={`form-control ${validated && validationErrors.textarea ? 'is-invalid' : 'is-valid' }`}
+                            invalidFeedback={ validated && validationErrors.textarea}/>
+
                     </div>
+
                     <div className="d-flex justify-content-center">
                         <button type="submit" className="btn btn-success me-4">Register</button>
                         <button type="reset" className="btn btn-primary" onClick={() => setFormData({
@@ -173,12 +204,12 @@ const RegisterPage = () => {
                             firstName: '',
                             password: '',
                             phone: '',
-                            photo: null
-                        })}>Cancel
-                        </button>
+                            image: null
+                        })}>Cancel</button>
                     </div>
                 </form>
             </div>
+
             <Modal show={showModal} onHide={() => setShowModal(false)}>
                 <Modal.Header closeButton>
                     <Modal.Title>Message</Modal.Title>

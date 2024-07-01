@@ -27,7 +27,7 @@ TextInput.propTypes = {
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
     onChange: PropTypes.func.isRequired,
     required: PropTypes.oneOf([true,false]).isRequired,
-    invalidFeedback: PropTypes.string.isRequired,
+    invalidFeedback: PropTypes.string,
     placeholder: PropTypes.string,
 
 
