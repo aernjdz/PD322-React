@@ -1,89 +1,75 @@
-import React, { useState ,useEffect} from 'react';
-import { TextInput, TextArea ,DateInput } from "../../common/input/text";
-import FileInput from "../../common/input/files";
+import React, { useEffect } from 'react';
+import { TextInput, TextArea, DateInput } from "../../common/input/text";
+import {FileInput} from "../../common/input/files";
 import { Modal, Button } from 'react-bootstrap';
 import * as Yup from 'yup';
 import IMask from "imask";
+import { useFormik } from "formik";
+
 const RegisterPage = () => {
-    const [formData, setFormData] = useState({
-        email: '',
-        lastName: '',
-        firstName: '',
-        password: '',
-        phone: '',
-        image: null
-    });
-    const [validated, setValidated] = useState(false);
-    const [showModal, setShowModal] = useState(false);
-    const [modalMessage, setModalMessage] = useState('');
-    const [validationErrors, setValidationErrors] = useState({});
-
     const phoneRegExp = /^\+\d{2}\(\d{3}\) \d{3}-\d{2}-\d{2}$/;
-    // Define Yup schema for validation
-
-    useEffect(() => {
-        const phoneInput = document.getElementById('phone');
-        if (phoneInput) {
-            const maskOptions = {
-                mask: '+00(000) 000-00-00',
-            };
-            IMask(phoneInput, maskOptions);
-        }
-
-    }, []);
-    const schema = Yup.object().shape({
+    const registrationSchema = Yup.object().shape({
         email: Yup.string().email('Invalid email').required('Email is required'),
         lastName: Yup.string().required('Last name is required'),
         firstName: Yup.string().required('First name is required'),
-        password: Yup.string().required('Password is required').min(6, 'Password must be at least 6 characters long'),
-        phone: Yup.string().matches(phoneRegExp, 'Phone number is not valid'),
+        password: Yup.string().min(6, 'Password must be at least 6 characters long').required('Password is required'),
+        phone: Yup.string().matches(phoneRegExp, 'Phone number is not valid').required('Phone number is required'),
         textarea: Yup.string().required('Text is required'),
         image: Yup.mixed().required('Profile picture is required').test(
             'fileType',
             'Please select a valid image file',
-            (value) => value && value?.type.startsWith('image/')
-        )
+            (value) => value && ['image/png','image/jpeg'].includes(value?.type)
+        ),
+        date: Yup.date().required('Date is required')
     });
 
-    const handleChange = (e) => {
-        const { name, value, files } = e.target;
-        if (name === 'photo' && files[0]) {
-            const file = files[0];
-            if (file.type.startsWith('image/')) {
-                setFormData({
-                    ...formData,
-                    image: file
+    const formik = useFormik({
+        initialValues: {
+            email: '',
+            lastName: '',
+            firstName: '',
+            password: '',
+            date: '',
+            textarea: '',
+            phone: '',
+            image: null
+        },
+        validationSchema: registrationSchema,
+        onSubmit: async (values) => {
+            try {
+                await registrationSchema.validate(values, { abortEarly: false });
+                console.log(`Form Add: ${JSON.stringify(values, null, 2)}`);
+            } catch (error) {
+                console.log(error);
+                const errors = {};
+                error.inner.forEach(err => {
+                    errors[err.path] = err.message;
                 });
-            } else {
-                setModalMessage("Please select a valid image file");
+
+                setModalMessage("Input Data is invalid! Please check input data.");
                 setShowModal(true);
             }
-        } else {
-            setFormData({
-                ...formData,
-                [name]: value
-            });
         }
-    };
+    });
 
+    const { values, touched, errors, handleSubmit, handleChange, setFieldValue, isValid, dirty } = formik;
 
-    const handleSubmit = async (e) => {
-        e.preventDefault();
-        try {
-            await schema.validate(formData, { abortEarly: false });
-            setValidated(true);
-            console.log(`Form Add: ${JSON.stringify(formData, null, 2)}`);
-        } catch (error) {
-            console.log(error);
-            setValidated(true);
-            const errors = {};
-            error.inner.forEach(err => {
-                errors[err.path] = err.message;
-            });
-            setValidationErrors(errors);
-            setModalMessage("Input Data is invalid! Please check input data.");
-            setShowModal(true);
-        }
+    // useEffect(() => {
+    //     const phoneInput = document.getElementById('phone');
+    //     if (phoneInput) {
+    //         const maskOptions = {
+    //             mask: '+00(000) 000-00-00',
+    //         };
+    //         IMask(phoneInput, maskOptions);
+    //     }
+    // }, []);
+
+    const [showModal, setShowModal] = React.useState(false);
+    const [modalMessage, setModalMessage] = React.useState('');
+
+    const handleFileChange = (event) => {
+        const file = event.currentTarget.files[0];
+        setFieldValue('image', file);
     };
 
     return (
@@ -91,7 +77,7 @@ const RegisterPage = () => {
             <h1 className="text-center">Register</h1>
             <div className="row mt-5">
                 <form id="signupForm"
-                      className={`col-md-6 offset-md-3 ${validated ? 'was-validated' : ''}`}
+                      className={`col-md-6 offset-md-3 `}//${!isValid && dirty ? 'was-validated' : ''}
                       onSubmit={handleSubmit} noValidate>
 
                     <div className="row">
@@ -101,14 +87,13 @@ const RegisterPage = () => {
                                 type="text"
                                 label="Last Name"
                                 name="lastName"
-                                value={formData.lastName}
+                                value={values.lastName}
                                 onChange={handleChange}
                                 required={true}
-                                className={`form-control ${validated && validationErrors.lastName ? 'is-invalid' : 'is-valid' }`}
                                 placeholder="Last Name"
-                                invalidFeedback={ validated && validationErrors.lastName}
-                            />
+                                error={errors.lastName}
 
+                            />
                         </div>
                         <div className="mb-3 col-md-6">
                             <TextInput
@@ -116,12 +101,11 @@ const RegisterPage = () => {
                                 label="First Name"
                                 type="text"
                                 name="firstName"
-                                value={formData.firstName}
+                                value={values.firstName}
                                 onChange={handleChange}
                                 required={true}
-                                className={`form-control ${validated && validationErrors.firstName ? 'is-invalid' : 'is-valid' }`}
                                 placeholder="First Name"
-                                invalidFeedback={validated && validationErrors.firstName}
+                                error={errors.firstName}
                             />
                         </div>
                     </div>
@@ -133,12 +117,11 @@ const RegisterPage = () => {
                                 label="Email"
                                 type="email"
                                 name="email"
-                                value={formData.email}
+                                value={values.email}
                                 onChange={handleChange}
                                 required={true}
-                                className={`form-control ${validated && validationErrors.email ? 'is-invalid' : 'is-valid' }`}
                                 placeholder="example@gmail.com"
-                                invalidFeedback={ validated && validationErrors.email}
+                                error={errors.email}
                             />
                         </div>
                         <div className="mb-3 col-md-6">
@@ -147,27 +130,26 @@ const RegisterPage = () => {
                                 label="Phone"
                                 type="tel"
                                 name="phone"
-                                value={formData.phone}
+                                value={values.phone}
                                 onChange={handleChange}
                                 required={true}
-                                className={`form-control ${validated && validationErrors.phone ? 'is-invalid' : 'is-valid' }`}
                                 placeholder="+XX(XXX) XXX-XX-XX"
-                                invalidFeedback={ validated && validationErrors.phone}/>
+                                error={errors.phone}
+                            />
                         </div>
                     </div>
 
-                    <div className="row d-flex align-items-center">
+                    <div className="row d-flex align-items-center mb-3">
                         <FileInput
                             id="photo"
                             label="Photo"
-                            name="photo"
+                            name="image"
                             accept="image/*"
-                            onChange={handleChange}
-                            value={formData.image}
+                            onChange={handleFileChange}
+                            value={values.image}
                             required={true}
-                            invalidFeedback={ validated && validationErrors.image}
-                            className={`form-control ${validated && validationErrors.image ? 'is-invalid' : 'is-valid' }`}/>
-
+                            error={errors.image}
+                        />
                     </div>
 
                     <div className="mb-3">
@@ -176,45 +158,38 @@ const RegisterPage = () => {
                             label="Password"
                             type="password"
                             name="password"
-                            value={formData.password}
+                            value={values.password}
                             onChange={handleChange}
                             required={true}
-                            className={`form-control ${validated && validationErrors.password ? 'is-invalid' : 'is-valid' }`}
-                            invalidFeedback={ validated && validationErrors.password}
+                            error={errors.password}
                         />
                     </div>
-                    <div className={'mb-3'}>
+                    <div className="mb-3">
                         <DateInput
                             onChange={handleChange}
-                            name={'date'}
-                            id={'date'}
-                            label={"Birth Day"}
+                            value={values.date}
+                            name="date"
+                            id="date"
+                            label="Birth Date"
                             required={true}
-
-                            />
+                            error={errors.date}
+                        />
                     </div>
                     <div className="mb-3">
                         <TextArea
                             id="textarea"
                             label="Hobbies"
                             name="textarea"
+                            value={values.textarea}
                             onChange={handleChange}
                             required={true}
-                            className={`form-control ${validated && validationErrors.textarea ? 'is-invalid' : 'is-valid' }`}
-                            invalidFeedback={ validated && validationErrors.textarea}/>
-
+                            error={errors.textarea}
+                        />
                     </div>
 
                     <div className="d-flex justify-content-center">
                         <button type="submit" className="btn btn-success me-4">Register</button>
-                        <button type="reset" className="btn btn-primary" onClick={() => setFormData({
-                            email: '',
-                            lastName: '',
-                            firstName: '',
-                            password: '',
-                            phone: '',
-                            image: null
-                        })}>Cancel</button>
+                        <button type="reset" className="btn btn-primary" onClick={() => formik.resetForm()}>Cancel</button>
                     </div>
                 </form>
             </div>

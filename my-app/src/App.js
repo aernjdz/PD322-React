@@ -7,18 +7,35 @@ import Layout from "./Components/containers";
 import HomePage from "./Components/home";
 import RegisterPage from "./Components/auth/register";
 import NotFoundPage from "./Components/pages/404";
+import ImageListPicker from "./Components/common/imageListPicker";
+import PizzaCreatePage from "./Components/pizza/create";
+import {useState} from "react";
+import {AuthContext,initState} from "./Components/auth/authContext";
 
 const App = () => {
+
+    const [auth, setAuth] = useState({
+        ...initState,
+        login : (user) => {
+            setAuth({...auth, isAuth: true,user});
+        },
+        logout: () =>{
+            setAuth({...auth, isAuth: false,user: null});
+        }
+    });
   return (
           <>
+              <AuthContext.Provider value={auth}>
               <Routes>
                   <Route path="/" element={<Layout />} >
                         <Route index element={<HomePage />} />
                         <Route path={"/register"} element={<RegisterPage />} />
+                        <Route path={'/test'} element={<ImageListPicker/>}/>
+                        <Route path={'/pizza/create'} element={<PizzaCreatePage/>}/>
                         <Route path={"*"} element={<NotFoundPage/>}></Route>
                   </Route>
               </Routes>
-
+              </AuthContext.Provider>
 
           </>
   );

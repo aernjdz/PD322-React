@@ -1,13 +1,16 @@
 import PropTypes from 'prop-types';
 import React from "react";
+import classNames from "classnames";
 
-const TextInput = ({ id, label, type, name, value, onChange, required = false, invalidFeedback,placeholder }) => {
+const TextInput = ({ id, label, type, name, value, onChange, required = false , error ,placeholder, touched }) => {
     return (
       <>
             <label htmlFor={id} className="form-label">{label}</label>
             <input
                 type={type}
-                className="form-control"
+                className={classNames("form-control",{
+                    "is-invalid": error
+                })}
                 id={id}
                 name={name}
                 value={value}
@@ -15,7 +18,7 @@ const TextInput = ({ id, label, type, name, value, onChange, required = false, i
                 onChange={onChange}
                 required={required}
             />
-            {invalidFeedback && <div className="invalid-feedback">{invalidFeedback}</div>}
+            {error && <div className="invalid-feedback">{error}</div>}
        </>
     );
 }
@@ -27,7 +30,39 @@ TextInput.propTypes = {
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
     onChange: PropTypes.func.isRequired,
     required: PropTypes.oneOf([true,false]).isRequired,
-    invalidFeedback: PropTypes.string,
+    placeholder: PropTypes.string,
+
+
+};
+
+const TextInput_nw = ({ id, label, type, name, value, onChange, required = false , error ,placeholder, touched }) => {
+    return (
+        <>
+            <label htmlFor={id} className="form-label">{label}</label>
+            <input
+                type={type}
+                className={classNames("form-control",{
+                    "is-invalid": error && touched
+                })}
+                id={id}
+                name={name}
+                value={value}
+                placeholder={placeholder}
+                onChange={onChange}
+                required={required}
+            />
+            {(error && touched) && <div className="invalid-feedback">{error}</div>}
+        </>
+    );
+}
+TextInput_nw.propTypes = {
+    id: PropTypes.string.isRequired,
+    label: PropTypes.string.isRequired,
+    type: PropTypes.oneOf(['text', 'password', 'email','tel']).isRequired,
+    name: PropTypes.string.isRequired,
+    value: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
+    onChange: PropTypes.func.isRequired,
+    required: PropTypes.oneOf([true,false]).isRequired,
     placeholder: PropTypes.string,
 
 
@@ -35,13 +70,14 @@ TextInput.propTypes = {
 
 
 
-
-const TextArea = ({ id, label, name, value, onChange, required = false, invalidFeedback, placeholder, rows }) => {
+const TextArea = ({ id, label, name, value, onChange, required = false, error, placeholder, rows }) => {
     return (
         <>
             <label htmlFor={id} className="form-label">{label}</label>
             <textarea
-                className="form-control"
+                className={classNames("form-control",{
+                    "is-invalid": error
+                })}
                 id={id}
                 name={name}
                 value={value}
@@ -50,7 +86,7 @@ const TextArea = ({ id, label, name, value, onChange, required = false, invalidF
                 required={required}
                 rows={rows}
             />
-            {invalidFeedback && <div className="invalid-feedback">{invalidFeedback}</div>}
+            {error && <div className="invalid-feedback">{error}</div>}
         </>
     );
 }
@@ -62,19 +98,20 @@ TextArea.propTypes = {
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
     onChange: PropTypes.func.isRequired,
     required: PropTypes.bool,
-    invalidFeedback: PropTypes.string,
     placeholder: PropTypes.string,
     rows: PropTypes.number,
 };
 
 
-const DateInput = ({ id, label, name, value, onChange, required = false, invalidFeedback, placeholder }) => {
+const DateInput = ({ id, label, name, value, onChange, required = false, error, placeholder }) => {
     return (
         <>
             <label htmlFor={id} className="form-label">{label}</label>
             <input
                 type="date"
-                className="form-control"
+                className={classNames("form-control",{
+                    "is-invalid": error
+                })}
                 id={id}
                 name={name}
                 value={value}
@@ -82,7 +119,7 @@ const DateInput = ({ id, label, name, value, onChange, required = false, invalid
                 onChange={onChange}
                 required={required}
             />
-            {invalidFeedback && <div className="invalid-feedback">{invalidFeedback}</div>}
+            {error && <div className="invalid-feedback">{error}</div>}
         </>
     );
 }
@@ -93,8 +130,8 @@ DateInput.propTypes = {
     value: PropTypes.oneOfType([PropTypes.string, PropTypes.object]),
     onChange: PropTypes.func.isRequired,
     required: PropTypes.bool,
-    invalidFeedback: PropTypes.string,
+
     placeholder: PropTypes.string,
 };
 
-export  {TextArea , TextInput , DateInput};
+export  {TextArea , TextInput , DateInput, TextInput_nw};

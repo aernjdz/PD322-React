@@ -1,7 +1,8 @@
-import {useState} from "react";
-
+import {useContext, useState} from "react";
+import {AuthContext} from "../auth/authContext";
 const HomePage = () => {
 
+    const {login} = useContext(AuthContext);
     const [list, setList] = useState([
         {
             id: 1,
@@ -46,6 +47,7 @@ const HomePage = () => {
     return (
         <>
             <h1 className={"text-center"}>Users</h1>
+            <button className={"btn btn-outline-dark"} onClick={ () => login( {name: "Aernjdz Dev"})}>Login</button>
             <table className="table">
                 <thead>
                 <tr>

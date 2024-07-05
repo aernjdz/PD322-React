@@ -1,6 +1,9 @@
 import {Link} from "react-router-dom";
-
+import {useContext} from "react";
+import {AuthContext} from "../../auth/authContext";
 const MainHeader = () => {
+    const {isAuth, user , logout} = useContext(AuthContext);
+    console.log(isAuth,user);
     return (
         <>
             <header data-bs-theme="dark">
@@ -16,6 +19,9 @@ const MainHeader = () => {
                                     <Link className="nav-link active" aria-current="page" to={"/"}>Home</Link>
                                 </li>
                                 <li className="nav-item">
+                                    <Link className="nav-link active" aria-current="page" to={"/pizza/create"}>Create</Link>
+                                </li>
+                                <li className="nav-item">
                                     <a className="nav-link" href="#">Link</a>
                                 </li>
                                 <li className="nav-item">
@@ -23,14 +29,31 @@ const MainHeader = () => {
                                 </li>
                             </ul>
 
-                            <ul className="navbar-nav ">
-                                <li className="nav-item">
-                                    <Link className="nav-link" aria-current="page" to={"/login"}>Log In</Link>
-                                </li>
-                                <li className="nav-item">
-                                    <Link className="nav-link" to={"/register"}>Sign Up</Link>
-                                </li>
-                            </ul>
+                            {isAuth ?
+                                <ul className="navbar-nav ">
+                                    <li className="nav-item">
+                                        <a className="nav-link" aria-current="page" href="/profile">{user.name}</a>
+                                    </li>
+                                    <li className="nav-item">
+                                        <Link className="nav-link" to="/logout" onClick={(e)=>
+                                        {
+                                            e.preventDefault();
+                                            logout();
+                                        }}>Log Out</Link>
+                                    </li>
+                                </ul>
+                                :
+                                <ul className="navbar-nav ">
+                                    <li className="nav-item">
+                                        <a className="nav-link" aria-current="page" href="#">Log In</a>
+                                    </li>
+                                    <li className="nav-item">
+                                        <Link className="nav-link" to="/register">Register</Link>
+                                    </li>
+                                </ul>
+                            }
+
+
                         </div>
                     </div>
                 </nav>
