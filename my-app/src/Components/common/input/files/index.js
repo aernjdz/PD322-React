@@ -13,7 +13,7 @@ const FileInput = ({ id, label, name, onChange, accept, required = false, value,
     const [image, setImage] = useState(value);
     const [cropper, setCropper] = useState(null);
     const [showModal, setShowModal] = useState(false);
-    const [errorMessage, setErrorMessage] = useState(null); // State for error message
+    const [errorMessage, setErrorMessage] = useState(null);
     const inputRef = useRef(null);
     const imgRef = useRef(null);
 
@@ -21,14 +21,14 @@ const FileInput = ({ id, label, name, onChange, accept, required = false, value,
         const file = event.target?.files?.[0];
         if (!file) {
             setErrorMessage("Please select a file.");
-            resetInput(); // Clear input field if no file selected
+            resetInput();
             return;
         }
 
         // Validate file type (accept only image files)
         if (!file.type.startsWith('image/')) {
             setErrorMessage("Only image files are allowed.");
-            resetInput(); // Clear input field if file format is invalid
+            resetInput();
             return;
         }
 
@@ -36,7 +36,7 @@ const FileInput = ({ id, label, name, onChange, accept, required = false, value,
         reader.onload = () => {
             setImage(reader.result);
             setShowModal(true);
-            setErrorMessage(null); // Clear error message if file is valid
+            setErrorMessage(null);
         };
         reader.readAsDataURL(file);
     };
@@ -67,7 +67,7 @@ const FileInput = ({ id, label, name, onChange, accept, required = false, value,
 
     const handleModalClose = () => {
         setShowModal(false);
-        setErrorMessage(null); // Clear error message when modal is closed
+        setErrorMessage(null);
     };
 
     return (
