@@ -38,7 +38,7 @@ const RegisterPage = () => {
         onSubmit: async (values) => {
             try {
                 await registrationSchema.validate(values, { abortEarly: false });
-                console.log(`Form Add: ${JSON.stringify(values, null, 2)}`);
+                console.log(`Form Add:`,values);
             } catch (error) {
                 console.log(error);
                 const errors = {};
@@ -68,8 +68,9 @@ const RegisterPage = () => {
     const [modalMessage, setModalMessage] = React.useState('');
 
     const handleFileChange = (event) => {
-        const file = event.currentTarget.files[0];
-        setFieldValue('image', file);
+        const files = event.target.value;
+        console.log(files);
+        setFieldValue('image', files);
     };
 
     return (
@@ -77,7 +78,7 @@ const RegisterPage = () => {
             <h1 className="text-center">Register</h1>
             <div className="row mt-5">
                 <form id="signupForm"
-                      className={`col-md-6 offset-md-3 `}//${!isValid && dirty ? 'was-validated' : ''}
+                      className={`col-md-6 offset-md-3 `} //${!isValid && dirty ? 'was-validated' : ''}
                       onSubmit={handleSubmit} noValidate>
 
                     <div className="row">

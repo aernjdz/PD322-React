@@ -1,38 +1,126 @@
-import React from "react";
+import React,{useRef,useState} from "react";
 import PropTypes from 'prop-types';
 import noPhoto from '../../../../assets/no-photo.png'
 import plus from '../../../../assets/plus.jpg'
 import classNames from "classnames";
 import './style.css';
+import Cropper from "cropperjs";
+import "cropperjs/dist/cropper.css";
+import { Modal, Button } from 'react-bootstrap';
+
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 const FileInput = ({ id, label, name, onChange, accept, required = false, value, error }) => {
-    const img = value === null ? noPhoto : URL.createObjectURL(value);
+    const [image, setImage] = useState(value);
+    const [cropper, setCropper] = useState(null);
+    const [showModal, setShowModal] = useState(false);
+    const inputRef = useRef(null);
+    const imgRef = useRef(null);
+
+    const handleFileChange = (event) => {
+        const file = event.target?.files?.[0];
+        if (!file) {
+            console.error("File input change event does not have files");
+            return;
+        }
+        console.log('Selected file:', file);
+
+        const reader = new FileReader();
+        reader.onload = () => {
+            setImage(reader.result);
+            setShowModal(true);
+        };
+        reader.readAsDataURL(file);
+    };
+
+    const handleRotate = () => {
+        if (cropper) {
+            cropper.rotate(90);
+        }
+    };
+
+    const handleCrop = () => {
+        if (cropper) {
+            const canvas = cropper.getCroppedCanvas();
+            canvas.toBlob(blob => {
+                const file = new File([blob], "cropped.jpg", { type: "image/jpeg" });
+                onChange({ target: { name, value: file } });
+                setImage(URL.createObjectURL(blob));
+                setShowModal(false);
+            });
+        }
+    };
+
+    const handleModalClose = () => setShowModal(false);
+
     return (
         <>
             <div className="col-md-3">
-            <label htmlFor="photo" className="form-label">
-                <img src={img} alt="Preview" id="userImg" width="100vw" className={"img-fluid"} />
-            </label>
+                <label htmlFor="photo" className="form-label">
+                    <img
+                        src={image || noPhoto}
+                        alt="Preview"
+                        id="userImg"
+                        width="100vw"
+                        className={"img-fluid"}
+                    />
+                </label>
             </div>
 
             <div className={"mb-3 col-md-9"}>
-            <label htmlFor={id} className="form-label">{label}</label>
-            <input
-                id={id}
-                name={name}
-                type="file"
-                className={classNames("form-control",{
-                    "is-invalid": error
-                })}
-                onChange={onChange}
-                accept={accept}
-                required={required}
-            />
-            {error && <div className="invalid-feedback">{error}</div>}
+                <label htmlFor={id} className="form-label">{label}</label>
+                <input
+                    ref={inputRef}
+                    id={id}
+                    name={name}
+                    type="file"
+                    className={classNames("form-control", {
+                        "is-invalid": error
+                    })}
+                    onChange={handleFileChange}
+                    accept={accept}
+                    required={required}
+                />
+                {error && <div className="invalid-feedback">{error}</div>}
             </div>
+
+            <Modal show={showModal} onHide={handleModalClose}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Crop Image</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <div className="crop-container">
+                        <img
+                            src={image}
+                            alt="Crop"
+                            ref={imgRef}
+                            style={{ maxWidth: "100%" }}
+                            onLoad={() => {
+                                if (cropper) cropper.destroy();
+                                const cropperInstance = new Cropper(imgRef.current, {
+                                    aspectRatio: 1,
+                                    viewMode: 1,
+                                    rotatable: true,
+                                });
+                                setCropper(cropperInstance);
+                            }}
+                        />
+                    </div>
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={handleModalClose}>
+                        Close
+                    </Button>
+                    <Button variant="primary" onClick={handleRotate}>
+                        Rotate 90°
+                    </Button>
+                    <Button variant="success" onClick={handleCrop}>
+                        Crop & Save
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </>
-    )
-}
+    );
+};
 
 FileInput.propTypes = {
     id: PropTypes.string.isRequired,
@@ -42,6 +130,7 @@ FileInput.propTypes = {
     onChange: PropTypes.func.isRequired,
     required: PropTypes.bool.isRequired,
     accept: PropTypes.string.isRequired,
+    error: PropTypes.string,
 }
 
 const MultiFileInput = ({ id, label, name, onChange, accept, required = false, value, error }) => {
