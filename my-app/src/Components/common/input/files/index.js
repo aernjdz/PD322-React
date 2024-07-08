@@ -13,23 +13,38 @@ const FileInput = ({ id, label, name, onChange, accept, required = false, value,
     const [image, setImage] = useState(value);
     const [cropper, setCropper] = useState(null);
     const [showModal, setShowModal] = useState(false);
+    const [errorMessage, setErrorMessage] = useState(null); // State for error message
     const inputRef = useRef(null);
     const imgRef = useRef(null);
 
     const handleFileChange = (event) => {
         const file = event.target?.files?.[0];
         if (!file) {
-            console.error("File input change event does not have files");
+            setErrorMessage("Please select a file.");
+            resetInput(); // Clear input field if no file selected
             return;
         }
-        console.log('Selected file:', file);
+
+        // Validate file type (accept only image files)
+        if (!file.type.startsWith('image/')) {
+            setErrorMessage("Only image files are allowed.");
+            resetInput(); // Clear input field if file format is invalid
+            return;
+        }
 
         const reader = new FileReader();
         reader.onload = () => {
             setImage(reader.result);
             setShowModal(true);
+            setErrorMessage(null); // Clear error message if file is valid
         };
         reader.readAsDataURL(file);
+    };
+
+    const resetInput = () => {
+        if (inputRef.current) {
+            inputRef.current.value = ''; // Reset input field
+        }
     };
 
     const handleRotate = () => {
@@ -50,7 +65,10 @@ const FileInput = ({ id, label, name, onChange, accept, required = false, value,
         }
     };
 
-    const handleModalClose = () => setShowModal(false);
+    const handleModalClose = () => {
+        setShowModal(false);
+        setErrorMessage(null); // Clear error message when modal is closed
+    };
 
     return (
         <>
@@ -74,12 +92,13 @@ const FileInput = ({ id, label, name, onChange, accept, required = false, value,
                     name={name}
                     type="file"
                     className={classNames("form-control", {
-                        "is-invalid": error
+                        "is-invalid": errorMessage // Apply is-invalid class based on errorMessage
                     })}
                     onChange={handleFileChange}
                     accept={accept}
                     required={required}
                 />
+                {errorMessage && <div className="invalid-feedback">{errorMessage}</div>}
                 {error && <div className="invalid-feedback">{error}</div>}
             </div>
 
@@ -131,8 +150,7 @@ FileInput.propTypes = {
     required: PropTypes.bool.isRequired,
     accept: PropTypes.string.isRequired,
     error: PropTypes.string,
-}
-
+};
 const MultiFileInput = ({ id, label, name, onChange, accept, required = false, value, error }) => {
     const [images, setImages] = React.useState([]);
     const [fileList, setFileList] = React.useState([]);

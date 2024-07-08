@@ -149,7 +149,7 @@ const RegisterPage = () => {
                             onChange={handleFileChange}
                             value={values.image}
                             required={true}
-                            error={errors.image}
+                            error={errors.image  ? errors.image : null}
                         />
                     </div>
 
