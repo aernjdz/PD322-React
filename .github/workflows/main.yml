@@ -1,0 +1,26 @@
+name: Build and Release
+
+on: 
+   push: 
+       branches: [ "master" ]
+   workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    
+      - uses: actions/checkout@v3
+      
+      - name: install dependencies
+        working-directory: my-app
+        run: npm ci
+
+      - name: build the app
+        working-directory: my-app
+        run: npm run build
+
+      - name: Deploy 🚀
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: my-app/dist
