@@ -19,7 +19,12 @@ const MainHeader = () => {
                                     <Link className="nav-link active" aria-current="page" to={"/"}>Home</Link>
                                 </li>
                                 <li className="nav-item">
-                                    <Link className="nav-link active" aria-current="page" to={"/pizza/create"}>Create</Link>
+                                    <Link className="nav-link active" aria-current="page"
+                                          to={"/pizza/create"}>Create</Link>
+                                </li>
+                                <li className="nav-item">
+                                    <Link className="nav-link active" aria-current="page"
+                                          to={"/NovaPostAPI"}>Nova Post API</Link>
                                 </li>
                                 <li className="nav-item">
                                     <a className="nav-link" href="#">Link</a>
@@ -32,7 +37,7 @@ const MainHeader = () => {
                             {isAuth ?
                                 <ul className="navbar-nav ">
                                     <li className="nav-item">
-                                        <a className="nav-link" aria-current="page" href="/profile">{user.name}</a>
+                                    <a className="nav-link" aria-current="page" href="/profile">{user.name}</a>
                                     </li>
                                     <li className="nav-item">
                                         <Link className="nav-link" to="/logout" onClick={(e)=>

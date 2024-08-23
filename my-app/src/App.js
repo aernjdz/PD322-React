@@ -11,6 +11,7 @@ import ImageListPicker from "./Components/common/imageListPicker";
 import PizzaCreatePage from "./Components/pizza/create";
 import {useState} from "react";
 import {AuthContext,initState} from "./Components/auth/authContext";
+import NovaPostaPage from "./Components/newPost";
 
 const App = () => {
 
@@ -32,7 +33,9 @@ const App = () => {
                         <Route path={"/register"} element={<RegisterPage />} />
                         <Route path={'/test'} element={<ImageListPicker/>}/>
                         <Route path={'/pizza/create'} element={<PizzaCreatePage/>}/>
-                        <Route path={"*"} element={<NotFoundPage/>}></Route>
+                        <Route path={'/NovaPostAPI'} element={<NovaPostaPage/>}/>
+                        <Route path={"*"} element={<NotFoundPage/>}/>
+
                   </Route>
               </Routes>
               </AuthContext.Provider>
