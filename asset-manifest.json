@@ -1,0 +1,21 @@
+{
+  "files": {
+    "main.css": "/static/css/main.27c2bc04.css",
+    "main.js": "/static/js/main.3a726dbb.js",
+    "static/js/453.a672f9c4.chunk.js": "/static/js/453.a672f9c4.chunk.js",
+    "static/media/markers-soft@2x.png": "/static/media/markers-soft@2x.1f2cc17911c8d4a3fa01.png",
+    "static/media/markers-soft.png": "/static/media/markers-soft.e52214306ad12a5c837e.png",
+    "static/media/cluster-pin-large_shop.png": "/static/media/cluster-pin-large_shop.0afe402d7da8a30f5ca4.png",
+    "static/media/punct-pin-large.png": "/static/media/punct-pin-large.966139cf817963bf0be4.png",
+    "static/media/cluster-pin-large.png": "/static/media/cluster-pin-large.152f195b2cfe31bd774b.png",
+    "static/media/no-photo.png": "/static/media/no-photo.63063464ad12ac2eb45f.png",
+    "index.html": "/index.html",
+    "main.27c2bc04.css.map": "/static/css/main.27c2bc04.css.map",
+    "main.3a726dbb.js.map": "/static/js/main.3a726dbb.js.map",
+    "453.a672f9c4.chunk.js.map": "/static/js/453.a672f9c4.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.27c2bc04.css",
+    "static/js/main.3a726dbb.js"
+  ]
+}
