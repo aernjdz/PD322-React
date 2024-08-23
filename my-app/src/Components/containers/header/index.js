@@ -1,8 +1,10 @@
 import {Link} from "react-router-dom";
 import {useContext} from "react";
 import {AuthContext} from "../../auth/authContext";
+import { useSelector } from "react-redux";
 const MainHeader = () => {
     const {isAuth, user , logout} = useContext(AuthContext);
+    const cart = useSelector((state) => state.products.carts);
     console.log(isAuth,user);
     return (
         <>
@@ -32,12 +34,18 @@ const MainHeader = () => {
                                 <li className="nav-item">
                                     <Link className="nav-link disabled" aria-disabled="true" to={"#"}>Disabled</Link>
                                 </li>
+                                <li className="nav-item">
+                                    <Link className="nav-link" aria-current="page" to="/products">
+                                        <i className="bi bi-cart"> </i>
+                                        <span className="badge bg-danger">{cart}</span>
+                                    </Link>
+                                </li>
                             </ul>
 
                             {isAuth ?
                                 <ul className="navbar-nav ">
                                     <li className="nav-item">
-                                    <a className="nav-link" aria-current="page" href="/profile">{user.name}</a>
+                                        <a className="nav-link" aria-current="page" href="/profile">{user.name}</a>
                                     </li>
                                     <li className="nav-item">
                                         <Link className="nav-link" to="/logout" onClick={(e)=>

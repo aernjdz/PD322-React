@@ -12,6 +12,7 @@ import PizzaCreatePage from "./Components/pizza/create";
 import {useState} from "react";
 import {AuthContext,initState} from "./Components/auth/authContext";
 import NovaPostaPage from "./Components/newPost";
+import ProductsPage from "./Components/products";
 
 const App = () => {
 
@@ -35,6 +36,7 @@ const App = () => {
                         <Route path={'/pizza/create'} element={<PizzaCreatePage/>}/>
                         <Route path={'/NovaPostAPI'} element={<NovaPostaPage/>}/>
                         <Route path={"*"} element={<NotFoundPage/>}/>
+                        <Route path={"products"} element={<ProductsPage/>} />
 
                   </Route>
               </Routes>
