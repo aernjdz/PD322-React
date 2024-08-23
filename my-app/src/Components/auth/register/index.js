@@ -1,9 +1,8 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import { TextInput, TextArea, DateInput } from "../../common/input/text";
 import {FileInput} from "../../common/input/files";
 import { Modal, Button } from 'react-bootstrap';
 import * as Yup from 'yup';
-import IMask from "imask";
 import { useFormik } from "formik";
 
 const RegisterPage = () => {
@@ -52,7 +51,7 @@ const RegisterPage = () => {
         }
     });
 
-    const { values, touched, errors, handleSubmit, handleChange, setFieldValue, isValid, dirty } = formik;
+    const { values, errors, handleSubmit, handleChange, setFieldValue } = formik;
 
     // useEffect(() => {
     //     const phoneInput = document.getElementById('phone');

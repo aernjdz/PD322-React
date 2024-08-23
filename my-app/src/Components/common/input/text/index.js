@@ -2,7 +2,7 @@ import PropTypes from 'prop-types';
 import React from "react";
 import classNames from "classnames";
 
-const TextInput = ({ id, label, type, name, value, onChange, required = false , error ,placeholder, touched }) => {
+const TextInput = ({ id, label, type, name, value, onChange, required = false , error ,placeholder}) => {
     return (
       <>
             <label htmlFor={id} className="form-label">{label}</label>
@@ -35,7 +35,7 @@ TextInput.propTypes = {
 
 };
 
-const TextInput_nw = ({ id, label, type, name, value, onChange, required = false , error ,placeholder, touched }) => {
+const TextInputnw = ({ id, label, type, name, value, onChange, required = false , error ,placeholder, touched }) => {
     return (
         <>
             <label htmlFor={id} className="form-label">{label}</label>
@@ -55,7 +55,7 @@ const TextInput_nw = ({ id, label, type, name, value, onChange, required = false
         </>
     );
 }
-TextInput_nw.propTypes = {
+TextInputnw.propTypes = {
     id: PropTypes.string.isRequired,
     label: PropTypes.string.isRequired,
     type: PropTypes.oneOf(['text', 'password', 'email','tel']).isRequired,
@@ -134,4 +134,4 @@ DateInput.propTypes = {
     placeholder: PropTypes.string,
 };
 
-export  {TextArea , TextInput , DateInput, TextInput_nw};
+export  {TextArea , TextInput , DateInput, TextInputnw};

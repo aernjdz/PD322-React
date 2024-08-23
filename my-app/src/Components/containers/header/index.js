@@ -27,10 +27,10 @@ const MainHeader = () => {
                                           to={"/NovaPostAPI"}>Nova Post API</Link>
                                 </li>
                                 <li className="nav-item">
-                                    <a className="nav-link" href="#">Link</a>
+                                    <Link className="nav-link" to={"#"}>Link</Link>
                                 </li>
                                 <li className="nav-item">
-                                    <a className="nav-link disabled" aria-disabled="true">Disabled</a>
+                                    <Link className="nav-link disabled" aria-disabled="true" to={"#"}>Disabled</Link>
                                 </li>
                             </ul>
 
@@ -50,7 +50,7 @@ const MainHeader = () => {
                                 :
                                 <ul className="navbar-nav ">
                                     <li className="nav-item">
-                                        <a className="nav-link" aria-current="page" href="#">Log In</a>
+                                        <Link className="nav-link" aria-current="page" to={"#"}>Log In</Link>
                                     </li>
                                     <li className="nav-item">
                                         <Link className="nav-link" to="/register">Register</Link>

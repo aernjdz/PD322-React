@@ -1,5 +1,5 @@
 import React from 'react';
-import { TextInput_nw } from "../../common/input/text";
+import { TextInputnw } from "../../common/input/text";
 
 import { Modal, Button } from 'react-bootstrap';
 import * as Yup from 'yup';
@@ -43,7 +43,7 @@ const PizzaCreatePage = () => {
         }
     });
 
-    const { values, touched, errors, handleSubmit, handleChange, setFieldValue, isValid, dirty } = formik;
+    const { values, touched, errors, handleSubmit, handleChange, setFieldValue} = formik;
 
     // useEffect(() => {
     //     const phoneInput = document.getElementById('phone');
@@ -82,7 +82,7 @@ const PizzaCreatePage = () => {
 
                     <div className="row">
                         <div className="mb-3 col-md-6">
-                            <TextInput_nw
+                            <TextInputnw
                                 id="name"
                                 type="text"
                                 label="Name"
@@ -97,7 +97,7 @@ const PizzaCreatePage = () => {
                             />
                         </div>
                         <div className="mb-3 col-md-6">
-                            <TextInput_nw
+                            <TextInputnw
                                 id="description"
                                 label="Description"
                                 type="text"
