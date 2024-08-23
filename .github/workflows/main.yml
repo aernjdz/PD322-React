@@ -1,8 +1,10 @@
 name: Build and Release
-
+permissions:
+     contents: write
 on: 
    push: 
        branches: [ "master" ]
+   
    workflow_dispatch:
 jobs:
   build:
@@ -23,4 +25,4 @@ jobs:
       - name: Deploy 🚀
         uses: JamesIves/github-pages-deploy-action@v4
         with:
-          folder: my-app/dist
+          folder: my-app/build
