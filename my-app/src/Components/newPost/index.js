@@ -1,10 +1,3 @@
-
-
-import markerIcon_all from "../../assets/cluster-pin-large.png";
-import markerIcon_point from "../../assets/punct-pin-large.png";
-import markerIcon_other from "../../assets/cluster-pin-large_shop.png";
-
-
 import {useEffect, useRef, useState} from "react";
 import axios from "axios";
 import Select from 'react-select';
@@ -15,6 +8,9 @@ import "leaflet.markercluster/dist/MarkerCluster.Default.css";
 import "leaflet.markercluster/dist/leaflet.markercluster.js";
 import "leaflet.awesome-markers/dist/leaflet.awesome-markers.css";
 import "leaflet.awesome-markers";
+import markerIcon_all from "../../assets/cluster-pin-large.png";
+import markerIcon_point from "../../assets/punct-pin-large.png";
+import markerIcon_other from "../../assets/cluster-pin-large_shop.png";
 
 const NovaPoshtaPage = () => {
     const apiKey = "63aa362a44e812e38243bd8fb803b606";
@@ -24,9 +20,11 @@ const NovaPoshtaPage = () => {
 
     const [selectedArea, setSelectedArea] = useState(null);
     const [selectedCity, setSelectedCity] = useState(null);
+    const [selectedWarehouse, setSelectedWarehouse] = useState(null);
 
     const mapRef = useRef(null);
     const markersRef = useRef([]);
+    const markerMapRef = useRef(new Map()); // Додаємо Map для зберігання маркерів
 
     useEffect(() => {
         displayMap([]);
@@ -61,6 +59,16 @@ const NovaPoshtaPage = () => {
         }
     }, [selectedCity]);
 
+    useEffect(() => {
+        if (selectedWarehouse && mapRef.current) {
+            const marker = markerMapRef.current.get(selectedWarehouse.Ref);
+            if (marker) {
+                mapRef.current.setView(marker.getLatLng(), 40); // Центруємо карту на вибране відділення
+                marker.openPopup(); // Відкриваємо попап для вибраного маркера
+            }
+        }
+    }, [selectedWarehouse]);
+
     const getAreas = async () => {
         try {
             const response = await axios.post('https://api.novaposhta.ua/v2.0/json/', {
@@ -91,7 +99,6 @@ const NovaPoshtaPage = () => {
     }
 
     const getWarehouses = async (cityRef) => {
-        console.log("CityRef", cityRef);
         try {
             const response = await axios.post('https://api.novaposhta.ua/v2.0/json/', {
                 apiKey: apiKey,
@@ -101,7 +108,6 @@ const NovaPoshtaPage = () => {
                     CityRef: cityRef
                 }
             });
-            console.log("response.data.data", response.data.data);
             return response.data.data;
         } catch (error) {
             console.error("Error fetching warehouses:", error);
@@ -121,6 +127,11 @@ const NovaPoshtaPage = () => {
         }).addTo(map);
 
         const markers = L.markerClusterGroup();
+        const bounds = [];
+
+        // Очищаємо старі маркери
+        markersRef.current = [];
+        markerMapRef.current = new Map();
 
         warehouses.forEach(warehouse => {
             const statusEmoji = warehouse.WarehouseStatus === 'Working' ? "🟢" : "🔴";
@@ -134,11 +145,16 @@ const NovaPoshtaPage = () => {
 
             markers.addLayer(marker);
             markersRef.current.push(marker);
+            markerMapRef.current.set(warehouse.Ref, marker); // Додаємо маркер до Map
+            bounds.push([warehouse.Latitude, warehouse.Longitude]);
         });
 
         map.addLayer(markers);
-    }
 
+        if (bounds.length > 0) {
+            map.fitBounds(bounds);
+        }
+    }
 
     return (
         <>
@@ -147,11 +163,11 @@ const NovaPoshtaPage = () => {
             <div className="primary-button mt-4">
                 <em>Select Area:</em>
                 <Select
-
-                    value={selectedArea==null ? "": selectedArea}
+                    value={selectedArea == null ? "" : selectedArea}
                     onChange={(selectedOption) => {
                         setSelectedArea(selectedOption);
                         setSelectedCity(null);
+                        setSelectedWarehouse(null);
                     }}
                     getOptionLabel={option => option.Description}
                     getOptionValue={option => option.Ref}
@@ -162,9 +178,10 @@ const NovaPoshtaPage = () => {
                     <div style={{marginLeft: '20px'}}>
                         <em>Select City:</em>
                         <Select
-                            value={selectedCity==null ? "": selectedCity}
+                            value={selectedCity == null ? "" : selectedCity}
                             onChange={(selectedOption) => {
                                 setSelectedCity(selectedOption);
+                                setSelectedWarehouse(null);
                             }}
                             getOptionLabel={option => option.Description}
                             getOptionValue={option => option.Ref}
@@ -177,6 +194,10 @@ const NovaPoshtaPage = () => {
                     <div style={{marginLeft: '20px'}}>
                         <em>Select Warehouse:</em>
                         <Select
+                            value={selectedWarehouse == null ? "" : selectedWarehouse}
+                            onChange={(selectedOption) => {
+                                setSelectedWarehouse(selectedOption);
+                            }}
                             getOptionLabel={option => option.Description}
                             getOptionValue={option => option.Ref}
                             options={warehouses}
@@ -186,8 +207,7 @@ const NovaPoshtaPage = () => {
 
             </div>
 
-
-            <div id="map" style={{ height: "490px", marginTop: "20px", zIndex: 0 }}></div>
+            <div id="map" style={{height: "490px", marginTop: "20px", zIndex: 0}}></div>
         </>
     )
 }
@@ -195,7 +215,9 @@ const NovaPoshtaPage = () => {
 export default NovaPoshtaPage;
 
 
-        const customMarkerIcon_point = L.icon({
+
+
+const customMarkerIcon_point = L.icon({
         iconUrl: markerIcon_point,
         iconSize: [48, 48],
         iconAnchor: [12, 41],
